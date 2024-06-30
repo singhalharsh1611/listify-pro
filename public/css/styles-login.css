@@ -1,10 +1,13 @@
 body{
     font-family: "Poppins", sans-serif;
-    background: #ececec;
+    /* background: #ececec; */
+    background-image: url("/assets/lock.jpg");
+    background-size: cover; 
 }
 
 .box-area{
     width: 930px;
+    
 }
 
 @media only screen and (max-width: 768px){

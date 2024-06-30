@@ -242,7 +242,6 @@ app.post("/addItem", async (req, res) => {
 app.post("/removeItem", async (req, res) => {
     const listName = req.body.listName;
     const itemToRemove = req.body.itemToRemove;
-    console.log(itemToRemove);
 
     try {
         const foundUser = await User.findById(req.user.id).exec();
@@ -257,17 +256,6 @@ app.post("/removeItem", async (req, res) => {
         res.redirect(`/listTitle/${listName}`);
     }
 });
-
-
-
-
-
-
-
-
-
-
-
 
 
 app.listen(3000, function(){
