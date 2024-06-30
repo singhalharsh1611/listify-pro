@@ -10,6 +10,8 @@ const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const findOrCreate = require("mongoose-findorcreate");
+const nodemailer = require("nodemailer");
+const crypto = require("crypto");
 
 const app = express();
 
@@ -29,7 +31,8 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-mongoose.connect("mongodb://localhost:27017/listifyPro");
+const connectionString = process.env.MONGODB_URL;
+mongoose.connect(connectionString);
 
 const userSchema = new mongoose.Schema({
     name:String,
@@ -39,7 +42,13 @@ const userSchema = new mongoose.Schema({
     lists:{
         type: Map,
         of: [String]
-    }
+    },
+    isVerified: {
+        type: Boolean,
+        default: false
+    },
+    verificationToken: String,
+    verificationTokenExpires: Date
 });
 
 userSchema.plugin(passportLocalMongoose);
@@ -78,6 +87,17 @@ passport.use(new GoogleStrategy({
     });
   }
 ));
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL, 
+      pass: process.env.EMAIL_PASSWORD 
+    }
+  });
+
+  module.exports = transporter;
+
 
 app.get("/auth/google",
     passport.authenticate('google', { scope: ["profile"] })
@@ -148,40 +168,117 @@ app.get('/logout', (req, res, next) => {
     });
   });
 
-app.post("/register", function(req, res) {
+app.get("/verification", (req, res)=>{
+  res.render("verification");
+});
+
+// app.post("/register", function(req, res) {
+//     const name = req.body.name;
+//     const username = req.body.username;
+//     const password = req.body.password;
+//         User.register({ username: username, name: name }, password, function(err, user) {
+//         if (err) {
+//             console.log(err);
+//             res.redirect("/register");
+//         } else {
+//             passport.authenticate("local")(req, res, function() {
+//                 res.redirect("/showLists");
+//             });
+//         }
+//     });
+// });
+
+app.post("/register", async (req, res) => {
     const name = req.body.name;
     const username = req.body.username;
     const password = req.body.password;
-
-    User.register({ username: username, name: name }, password, function(err, user) {
-        if (err) {
-            console.log(err);
-            res.redirect("/register");
-        } else {
-            passport.authenticate("local")(req, res, function() {
-                res.redirect("/showLists");
-            });
-        }
-    });
-});
-
-app.post("/home", function(req, res){
-    const user = new User({
-        username: req.body.username,
-        password: req.body.password
+    const token = crypto.randomBytes(32).toString("hex");
+  
+    try {
+      const user = new User({
+        username: username,
+        name: name,
+        verificationToken: token,
+        verificationTokenExpires: Date.now() + 3600000 // 1 hour
       });
-    
-      req.login(user, function(err){
+  
+      User.register(user, password, async (err, user) => {
         if (err) {
           console.log(err);
+          res.redirect("/register");
         } else {
-          passport.authenticate("local", {failureRedirect: "/login?error=Invalid credentials, Please try again"})(req, res, function(){
-            res.redirect("/showLists");
-            
+          const verificationLink = `http://${req.headers.host}/verify-email?token=${token}`;
+          const mailOptions = {
+            from: process.env.EMAIL,
+            to: username,
+            subject: 'Email Verification',
+            text: `Please click the following link to verify your email: ${verificationLink}`
+          };
+  
+          transporter.sendMail(mailOptions, (err, info) => {
+            if (err) {
+              console.log(err);
+              res.redirect("/register");
+            } else {
+              console.log("Email sent: " + info.response);
+            //   res.send("A verification email has been sent to your email address. Please verify your email to complete registration.");
+            res.redirect('/verification');
+            }
           });
         }
       });
+    } catch (err) {
+      console.log(err);
+      res.redirect("/register");
+    }
+  });
+
+  app.get("/verify-email", async (req, res) => {
+    const { token } = req.query;
+  
+    try {
+      const user = await User.findOne({
+        verificationToken: token,
+        verificationTokenExpires: { $gt: Date.now() }
+      });
+  
+      if (!user) {
+        res.send("Verification link is invalid or has expired.");
+      } else {
+        user.isVerified = true;
+        user.verificationToken = undefined;
+        user.verificationTokenExpires = undefined;
+        await user.save();
+        res.redirect("/login");
+      }
+    } catch (err) {
+      console.log(err);
+      res.redirect("/register");
+    }
+  });
+
+app.post("/home", async (req, res) => {
+  const user = new User({
+    username: req.body.username,
+    password: req.body.password
+  });
+
+  req.login(user, async (err) => {
+    if (err) {
+      console.log(err);
+    } else {
+      const foundUser = await User.findOne({ username: req.body.username });
+      if (!foundUser.isVerified) {
+        res.redirect("/login?error=Please verify your email to log in.");
+      } else {
+        passport.authenticate("local", { failureRedirect: "/login?error=Invalid credentials, Please try again" })(req, res, function () {
+          res.redirect("/showLists");
+        });
+      }
+    }
+  });
 });
+
 
 
 app.post("/addList", async (req, res) => {
