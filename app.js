@@ -96,7 +96,8 @@ app.get("/", function(req, res){
 });
 
 app.get("/login", function(req, res){
-    res.render("login");
+    const errorMessage = req.query.error || null;
+    res.render("login", { errorMessage: errorMessage});
 });
 
 app.get("/register", function(req, res){
@@ -174,7 +175,7 @@ app.post("/home", function(req, res){
         if (err) {
           console.log(err);
         } else {
-          passport.authenticate("local")(req, res, function(){
+          passport.authenticate("local", {failureRedirect: "/login?error=Invalid credentials, Please try again"})(req, res, function(){
             res.redirect("/showLists");
             
           });
