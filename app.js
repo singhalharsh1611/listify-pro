@@ -138,7 +138,14 @@ app.get("/listTitle/:listName", async function(req, res) {
     }
 });
 
-
+app.get('/logout', (req, res, next) => {
+    req.logout((err) => {
+      if (err) {
+        return next(err);
+      }
+      res.redirect('/');
+    });
+  });
 
 app.post("/register", function(req, res) {
     const name = req.body.name;
