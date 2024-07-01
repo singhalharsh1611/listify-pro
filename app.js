@@ -12,8 +12,13 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const findOrCreate = require("mongoose-findorcreate");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
+const favicon = require('serve-favicon')
+const path = require('path')
 
 const app = express();
+const pathw = path.join(__dirname, '/public/assets', 'favicon.ico')
+console.log("path: "+pathw);
+
 
 app.use(express.static("public"));
 app.set('view engine', 'ejs');
