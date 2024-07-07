@@ -17,6 +17,11 @@
 ## Video Demo:
 https://www.loom.com/share/70671deb58fc46afbe8381543b4f5a1a
 
+
+https://github.com/singhalharsh1611/listify-pro/assets/70061407/1d7535d6-c09e-4e07-b453-eb9a994af388
+
+
+
 ## Some Screenshots:
 ![Screenshot 2024-07-07 190229](https://github.com/singhalharsh1611/listify-pro/assets/70061407/c1a1c2f1-1a3a-41d3-9a95-9fe782bfea7e)
 ![Screenshot 2024-07-07 190239](https://github.com/singhalharsh1611/listify-pro/assets/70061407/d1509b1a-9eb8-454e-b030-78a0879f76e2)
