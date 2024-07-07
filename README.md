@@ -1,6 +1,19 @@
 # Listify Pro
  Listify Pro is a web application that helps you manage and organize your tasks and lists with ease. Featuring secure login, intuitive list management, and real-time updates, it’s your go-to tool for staying organized and productive.
 
+## Features:
+🔐 Login and Signup: Secure login and signup functionalities to get you started.
+
+🔑 Google Login and Signup: Quick and easy access using your Google account.
+
+📧 Email Verification: New users must verify their email to activate their account—login is only available after verification.
+
+📦 MongoDB Integration: Reliable storage for all your tasks and lists.
+
+📋 Categorized Tasks: Create and manage different lists to categorize your tasks effectively.
+
+📱 Responsive Design: Enjoy a seamless experience on all devices, including smartphones, tablets, and desktops.
+
 ## Video Demo:
 https://www.loom.com/share/70671deb58fc46afbe8381543b4f5a1a
 
