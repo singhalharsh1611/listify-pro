@@ -367,3 +367,5 @@ app.post("/removeItem", async (req, res) => {
 app.listen(3000, function(){
     console.log("server at 3000");
 })
+
+module.exports = app;
