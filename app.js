@@ -312,6 +312,7 @@ app.post("/addList", async (req, res) => {
         res.redirect("/showLists");
     } catch (err) {
         console.log(err);
+        console.log("cannot post your list data");
         res.redirect("/showLists");
     }
 });
