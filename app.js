@@ -17,8 +17,8 @@ const app = express();
 
 
 app.use(express.static(path.join(__dirname, 'public')));
-app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
 app.use(bodyParser.urlencoded({
     extended:true
@@ -37,6 +37,10 @@ const connectionString = process.env.MONGODB_URL;
 mongoose.connect(connectionString, {
     useNewUrlParser: true,
     useUnifiedTopology: true
+}).then(() => {
+    console.log("Connected to MongoDB");
+}).catch(err => {
+    console.error("Failed to connect to MongoDB", err);
 });
 
 const userSchema = new mongoose.Schema({
