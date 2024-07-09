@@ -290,31 +290,30 @@ app.post("/home", async (req, res) => {
   });
 });
 
+
+
 app.post("/addList", async (req, res) => {
-  if (req.isAuthenticated()) {
-      const newList = req.body.newList;
-      try {
-          const currentUser = await User.findById(req.user.id).exec();
+    const newList = req.body.newList;
 
-          // Initialize lists if not present
-          if (!currentUser.lists) {
-              currentUser.lists = new Map();
-          }
+    try {
+        const currentUser = await User.findById(req.user.id).exec();
+        
+        // Initialize lists if not present
+        if (!currentUser.lists) {
+            currentUser.lists = new Map();
+        }
 
-          // Add new list if it doesn't exist
-          if (!currentUser.lists.has(newList)) {
-              currentUser.lists.set(newList, []);
-              await currentUser.save();
-          }
+        // Add new list if it doesn't exist
+        if (!currentUser.lists.has(newList)) {
+            currentUser.lists.set(newList, []);
+            await currentUser.save();
+        }
 
-          res.redirect("/showLists");
-      } catch (err) {
-          console.log(err);
-          res.redirect("/showLists");
-      }
-  } else {
-      res.redirect("/login");
-  }
+        res.redirect("/showLists");
+    } catch (err) {
+        console.log(err);
+        res.redirect("/showLists");
+    }
 });
 
 
