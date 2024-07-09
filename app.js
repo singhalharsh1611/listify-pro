@@ -34,7 +34,10 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 const connectionString = process.env.MONGODB_URL;
-mongoose.connect(connectionString);
+mongoose.connect(connectionString, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+});
 
 const userSchema = new mongoose.Schema({
     name:String,
