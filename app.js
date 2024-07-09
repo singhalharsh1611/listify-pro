@@ -14,6 +14,7 @@ const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 const path = require('path');
 const app = express();
+const MongoStore = require('connect-mongo');
 
 console.log(`Callback URL: ${process.env.CALLBACK_URL}`);
 
@@ -27,23 +28,23 @@ app.use(bodyParser.urlencoded({
 }));
 
 app.use(session({
-    secret: "My untold secret",
-    resave: false,
-    saveUninitialized: false
+  secret: "My untold secret",
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({ mongoUrl: process.env.MONGODB_URL })
 }));
 
 app.use(passport.initialize());
 app.use(passport.session());
 
 const connectionString = process.env.MONGODB_URL;
-mongoose.connect(connectionString, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(() => {
-    console.log("Connected to MongoDB");
-}).catch(err => {
-    console.error("Failed to connect to MongoDB", err);
-});
+mongoose.connect(process.env.MONGODB_URL)
+    .then(() => {
+        console.log("Connected to MongoDB");
+    })
+    .catch(err => {
+        console.error("Failed to connect to MongoDB", err);
+    });
 
 const userSchema = new mongoose.Schema({
     name:String,
