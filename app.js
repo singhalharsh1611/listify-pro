@@ -268,27 +268,20 @@ app.post("/register", async (req, res) => {
     }
   });
 
-app.post("/home", async (req, res) => {
-  const user = new User({
-    username: req.body.username,
-    password: req.body.password
-  });
-
-  req.login(user, async (err) => {
-    if (err) {
-      console.log(err);
-    } else {
-      const foundUser = await User.findOne({ username: req.body.username });
+  app.post("/home", passport.authenticate("local", { failureRedirect: "/login?error=Invalid credentials, Please try again" }), async (req, res) => {
+    try {
+      const foundUser = await User.findById(req.user.id).exec();
       if (!foundUser.isVerified) {
         res.redirect("/login?error=Please verify your email to log in.");
       } else {
-        passport.authenticate("local", { failureRedirect: "/login?error=Invalid credentials, Please try again" })(req, res, function () {
-          res.redirect("/showLists");
-        });
+        res.redirect("/showLists");
       }
+    } catch (err) {
+      console.log(err);
+      res.redirect("/login?error=Something went wrong");
     }
   });
-});
+  
 
 
 
