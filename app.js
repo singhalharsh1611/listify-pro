@@ -15,6 +15,8 @@ const crypto = require("crypto");
 const path = require('path');
 const app = express();
 
+console.log(`Callback URL: ${process.env.CALLBACK_URL}`);
+
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
